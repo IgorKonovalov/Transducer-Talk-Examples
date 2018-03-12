@@ -9,37 +9,55 @@ const timeIt = (label, fn) => {
 
 const arrayOfMillion = arrayOfRandoms(100)(1e6)
 
-const doubleTheNumber = x => x * 2
+const multiplyByThree = x => x * 3
 const isEven = x => x % 2 === 0
 
 timeIt('million map', () => {
   arrayOfMillion
-    .map(doubleTheNumber)
+    .map(multiplyByThree)
 })
 
 timeIt('million map + filter', () => {
   arrayOfMillion
-    .map(doubleTheNumber)
+    .map(multiplyByThree)
     .filter(isEven)
 })
 
 timeIt('million 2 map + filter', () => {
   const res = arrayOfMillion
-    .map(doubleTheNumber)
-    .map(doubleTheNumber)
+    .map(multiplyByThree)
+    .map(multiplyByThree)
     .filter(isEven)
-  // console.log('million 2 map res', res.length)
 })
 
-timeIt('iterative 2 map + filter', () => {
+timeIt('million 3 map + filter', () => {
+  const res = arrayOfMillion
+    .map(multiplyByThree)
+    .map(multiplyByThree)
+    .map(multiplyByThree)
+    .filter(isEven)
+})
+
+timeIt('iterative million map + filter', () => {
   const res = []
   let el
   for (let i = 0; i < arrayOfMillion.length; i++) {
-    el = doubleTheNumber(doubleTheNumber(arrayOfMillion[i]))
+    el = multiplyByThree(arrayOfMillion[i])
     if (el % 2 === 0) {
       res.push(el)
     }
   }
-  // console.log('iteration length', res.length)
+  return res
+})
+
+timeIt('iterative million 3 map + filter', () => {
+  const res = []
+  let el
+  for (let i = 0; i < arrayOfMillion.length; i++) {
+    el = multiplyByThree(multiplyByThree(multiplyByThree(arrayOfMillion[i])))
+    if (el % 2 === 0) {
+      res.push(el)
+    }
+  }
   return res
 })
