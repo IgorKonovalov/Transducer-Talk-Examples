@@ -1,12 +1,13 @@
-import { map, filter, seq, compose } from 'transducers.js'
+const { performance } = require('perf_hooks')
+const { map, filter, seq, compose } = require('transducers.js')
 
 const arrayOfRandoms = randomCeil => length =>
   Array.from({ length }, (v, i) => Math.floor(Math.random() * randomCeil))
 
 const timeIt = (label, fn) => {
-  console.time(label)
+  const start = performance.now()
   fn()
-  console.timeEnd(label)
+  console.log(label, performance.now() - start)
 }
 
 const tripleIt = x => x * 3
@@ -40,11 +41,11 @@ timeIt('chained * 4', () => {
 
 timeIt('imperative * 4', () => {
   const res = []
-  for (let i = 0; i < arrayOfMillion.length; i++) {
+  const length = arrayOfMillion.length
+  for (let i = 0; i < length; i++) {
     let el = arrayOfMillion[i]
     if (el % 2 === 0) {
-      el = tripleIt(tripleIt(tripleIt(tripleIt(el))))
-      res.push(el)
+      res.push(tripleIt(tripleIt(tripleIt(tripleIt(el)))))
     }
   }
   return res
