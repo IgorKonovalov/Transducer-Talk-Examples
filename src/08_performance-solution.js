@@ -1,3 +1,4 @@
+'use strict'
 const { performance } = require('perf_hooks')
 const { map, filter, seq, compose } = require('transducers.js')
 
@@ -13,25 +14,14 @@ const timeIt = (label, fn) => {
 const tripleIt = x => x * 3
 const isEven = x => x % 2 === 0
 
+let r1, r2, r3
+
 const arrayOfMillion = arrayOfRandoms(100)(1e6)
 
 //
 
-timeIt('chained', () => {
-  arrayOfMillion
-    .filter(isEven)
-    .map(tripleIt)
-})
-
-timeIt('chained * 2', () => {
-  arrayOfMillion
-    .filter(isEven)
-    .map(tripleIt)
-    .map(tripleIt)    
-})
-
 timeIt('chained * 4', () => {
-  arrayOfMillion  
+  r1 = arrayOfMillion  
     .filter(isEven)
     .map(tripleIt)
     .map(tripleIt)
@@ -48,23 +38,12 @@ timeIt('imperative * 4', () => {
       res.push(tripleIt(tripleIt(tripleIt(tripleIt(el)))))
     }
   }
+  r2 = res
   return res
 })
 
-const transform = compose(filter(isEven), map(tripleIt))
-
-timeIt('transducer', () => {
-  seq(
-    arrayOfMillion,
-    compose(
-      filter(isEven),
-      map(tripleIt),
-    )
-  )
-})
-
 timeIt('transducer * 4', () => {
-  seq(
+  r3 = seq(
     arrayOfMillion,
     compose(
       filter(isEven),   
@@ -75,3 +54,6 @@ timeIt('transducer * 4', () => {
     )
   )
 })
+
+console.log(JSON.stringify(r1) === JSON.stringify(r2))
+console.log(JSON.stringify(r2) === JSON.stringify(r3))

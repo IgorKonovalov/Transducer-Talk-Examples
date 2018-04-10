@@ -1,4 +1,5 @@
 const Immutable = require('immutable')
+const Rx = require('rxjs')
 const {
   toArray,
   toIter,
@@ -11,35 +12,44 @@ const {
   map
 } = require('transducers.js')
 
-// Immutable Map -> Iterable (Lazy)
+// predicate 
+const isEven = x => x % 2 === 0
 
-const map1 = Immutable.Map({ a: 1, b: 2, c: 3 })
+// xform
+const tripleIt = x => x * 3
+const increment = x => x + 1
+const divideByThree = x => x / 3
 
-const iterator = toIter(map1)
+// Immutable Map -> transformation -> Iterable (Lazy)
+
+const immutableMap = Immutable.Map({ a: 1, b: 2, c: 3, d: 4 })
+
+const iterator = toIter(
+  immutableMap,
+  compose(
+    map(x => x[1]),
+    map(tripleIt),
+    filter(isEven)
+  )
+)
+
 console.log(iterator.next())
 console.log(iterator.next())
 console.log(iterator.next())
 
 // Immutable Range -> transform -> Array
 
-const isEvenFilter = filter(isEven)
-const tripleMap = map(tripleIt)
-const pushReducer = (a, x) => {
-  a.push(x)
-  return a
-}
-
 const transform = compose(
-  map(x => x * 2),
-  map(x => x / 4),
-  filter(x => x % 3 === 0),
-  take(5),
+  map(tripleIt),
+  map(divideByThree),
+  filter(isEven),
+  take(10),
 )
 
-const resObj = into(
+const resArr = into(
   [],
   transform,
   Immutable.Range()
 )
 
-resObj
+resArr
